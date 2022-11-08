@@ -66,6 +66,10 @@ while True:
         tello.move_up(30)
     elif key == ord('f'):
         tello.move_down(30)
+    elif key == ord('p'):
+        frame_read = tello.get_frame_read()
+        cv2.imwrite("photo/picture.png", frame_read.frame)
 
+tello.land()
 hands.close()
 tello.land()

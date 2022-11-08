@@ -12,7 +12,6 @@ from gestures import *
 
 import threading
 
-
 def get_args():
     print('## Reading configuration ##')
     parser = configargparse.ArgParser(default_config_files=['config.txt'])
@@ -49,6 +48,18 @@ def select_mode(key, mode):
     if key == 104:  # h
         mode = 2
     return number, mode
+
+def cartoon_filter(img):
+    h, w = img.shape[:2]
+    img2 = cv.resize(img, (w//2, h//2))
+
+    blr = cv.bilateralFilter(img2, -1, 20, 7)
+    edge = 255 - cv.Canny(img2, 80, 120)
+    edge = cv.cvtColor(edge, cv.COLOR_GRAY2BGR)
+    dst = cv.bitwise_and(blr, edge) # and연산
+    dst = cv.resize(dst, (w, h), interpolation=cv.INTER_NEAREST)
+                                                                  
+    return dst
 
 
 def main():
@@ -100,11 +111,11 @@ def main():
     number = -1
     battery_status = -1
 
-    #tello.move_down(20)
+    tello.move_down(20)
 
     while True:
         fps = cv_fps_calc.get()
-    
+
         # Process Key (ESC: end)
         key = cv.waitKey(1) & 0xff
         if key == 27:  # ESC
@@ -132,6 +143,8 @@ def main():
             WRITE_CONTROL = True
             KEYBOARD_CONTROL = True
 
+        
+
         if WRITE_CONTROL:
             number = -1
             if 48 <= key <= 57:  # 0 ~ 9
@@ -139,19 +152,20 @@ def main():
 
         # Camera capture
         image = cap.frame
-
+        # print(image)
+        
         debug_image, gesture_id = gesture_detector.recognize(image, number, mode)
         gesture_buffer.add_gesture(gesture_id)
 
         # Start control thread
         threading.Thread(target=tello_control, args=(key, keyboard_controller, gesture_controller,)).start()
-        threading.Thread(target=tello_battery, args=(tello,)).start()
+        # threading.Thread(target=tello_battery, args=(tello,)).start()
 
         debug_image = gesture_detector.draw_info(debug_image, fps, mode, number)
 
         # Battery status and image rendering
-        # cv.putText(debug_image, "Battery: {}".format(battery_status), (5, 720 - 5),
-        #            cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        cv.putText(debug_image, "Battery: {}".format(battery_status), (5, 720 - 5),
+                   cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
         cv.imshow('Tello Gesture Recognition', debug_image)
 
     tello.land()

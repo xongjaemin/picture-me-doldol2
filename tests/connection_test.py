@@ -11,4 +11,6 @@ if __name__ == '__main__':
     tello.streamon()
     print('\n')
 
+    print(tello.get_battery())
     tello.end()
+    
