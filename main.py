@@ -40,7 +40,7 @@ def adjust_tello_position(tello, offset_x, offset_y, offset_z):
         if offset_z < 15000:
             tello.move_forward(20)
         elif offset_z > 30000:
-            tello.move_backward(20) 
+            tello.move_back(20) 
 
 def get_args():
     print('## Reading configuration ##')
