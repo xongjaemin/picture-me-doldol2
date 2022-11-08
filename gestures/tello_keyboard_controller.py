@@ -2,10 +2,12 @@ from djitellopy import Tello
 import cv2 as cv
 from utils.panorama import Panorama
 import time
+from utils.cartoon import Cartoon
 
 class TelloKeyboardController:
     def __init__(self, tello: Tello):
         self.tello = tello
+
     def panorama(self):
         self.tello.rotate_counter_clockwise(25)
         time.sleep(2)
@@ -23,6 +25,11 @@ class TelloKeyboardController:
         cv.imwrite("photo/picture3.jpg", frame_read.frame)
         self.tello.rotate_counter_clockwise(25)
         Panorama.createPano()
+
+    def cartoon(self):
+        frame_read = self.tello.get_frame_read()
+        print('cartoon')
+        Cartoon.create_cartoon(frame_read.frame)
 
     def control(self, key):
         if key == ord('w'):
@@ -43,6 +50,8 @@ class TelloKeyboardController:
             self.tello.move_down(30)
         elif key == ord('p'):
             self.panorama()
+        elif key == ord('c'):
+            self.cartoon()
 
 
     
