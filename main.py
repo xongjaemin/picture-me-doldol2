@@ -12,14 +12,11 @@ from gestures import *
 
 
 import threading
-    # Camera preparation
-tello = Tello()
-tello.connect()
-tello.streamon()
+
 
 face_cascade = cv.CascadeClassifier('cascades/haarcascade_frontalface_default.xml')
 
-def adjust_tello_position(offset_x, offset_y, offset_z):
+def adjust_tello_position(tello, offset_x, offset_y, offset_z):
     """
     Adjusts the position of the tello drone based on the offset values given from the frame
 
@@ -105,6 +102,11 @@ def main():
     KEYBOARD_CONTROL = args.is_keyboard
     WRITE_CONTROL = False
     in_flight = False
+
+    # Camera preparation
+    tello = Tello()
+    tello.connect()
+    tello.streamon()
 
     cap = tello.get_frame_read()
 
@@ -201,7 +203,7 @@ def main():
         height = cap.get(cv.CAP_PROP_FRAME_HEIGHT)
         width = cap.get(cv.CAP_PROP_FRAME_WIDTH)
         """
-        height, width, _ = cap.frame.shape
+        height, width, _ = image.shape
 
         # Calculate frame center
         center_x = int(width/2)
@@ -234,7 +236,7 @@ def main():
         offset_y = face_center_y - center_y - 30
 
         cv.putText(debug_image, f'[{offset_x}, {offset_y}, {z_area}]', (10, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255,255,255), 2, cv.LINE_AA)
-        adjust_tello_position(offset_x, offset_y, z_area)
+        # adjust_tello_position(tello, offset_x, offset_y, z_area)
 
         cv.imshow('Tello Gesture Recognition', debug_image)
 
