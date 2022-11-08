@@ -31,6 +31,17 @@ class TelloKeyboardController:
         print('cartoon')
         Cartoon.create_cartoon(frame_read.frame)
 
+    def timer(self, count):
+        for i in range(count):
+            print('taking picture in : ', count-i)
+            self.tello.rotate_clockwise(360)
+            time.sleep(10)
+        frame_read = self.tello.get_frame_read()
+        cv.imwrite("photo/timer.jpg", frame_read.frame)
+        print('success!')
+
+
+
     def control(self, key):
         if key == ord('w'):
             self.tello.move_forward(30)
@@ -52,6 +63,8 @@ class TelloKeyboardController:
             self.panorama()
         elif key == ord('c'):
             self.cartoon()
+        elif key == ord('t'):
+            self.timer(3)
 
 
     
