@@ -13,6 +13,15 @@ from gestures import *
 
 import threading
 
+TOLERANCE_X = 5
+TOLERANCE_Y = 5
+SLOWDOWN_THRESHOLD_X = 20
+SLOWDOWN_THRESHOLD_Y = 20
+DRONE_SPEED_X = 20
+DRONE_SPEED_Y = 20
+SET_POINT_X = 960/2
+SET_POINT_Y = 720/2
+
 
 face_cascade = cv.CascadeClassifier('cascades/haarcascade_frontalface_default.xml')
 
@@ -196,47 +205,60 @@ def main():
         cv.putText(debug_image, "Battery: {}".format(battery_status), (5, 720 - 5),
                    cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
         
+        # #face detecting
+        # gray = cv.cvtColor(debug_image, cv.COLOR_BGR2GRAY)
+        # faces = face_cascade.detectMultiScale(  # face detection
+        #     gray,
+        #     scaleFactor=1.1,
+        #     minNeighbors=5,
+        #     minSize=(30, 30),
+        #     flags=cv.CASCADE_SCALE_IMAGE
+        # )
 
+        # i = 0
+        # # Decorating image for debug purposes and looping through every detected face
+        # for (x, y, w, h) in faces:
 
-        #face detecting
-        """
-        height = cap.get(cv.CAP_PROP_FRAME_HEIGHT)
-        width = cap.get(cv.CAP_PROP_FRAME_WIDTH)
-        """
-        height, width, _ = image.shape
+        #     cv.rectangle(debug_image, (x, y), (x+w, y+h), (255, 0, 0), 5)  # contour rectangle
+        #     cv.circle(debug_image, (int(x+w/2), int(y+h/2)), 12, (255, 0, 0), 1)  # face-centered circle
+        #     # print(frame.shape)
+        #     # cv2.line(frame, (int(x+w/2), int(720/2)), (int(960/2), int(720/2)), (0, 255, 255))
 
-        # Calculate frame center
-        center_x = int(width/2)
-        center_y = int(height/2)
+        #     cv.circle(debug_image, (int(SET_POINT_X), int(SET_POINT_Y)), 12, (255, 255, 0), 8)  # setpoint circle
+        #     i = i+1
+        #     distanceX = x+w/2 - SET_POINT_X
+        #     distanceY = y+h/2 - SET_POINT_Y
 
-        # Draw the center of the frame
-        cv.circle(debug_image, (center_x, center_y), 10, (0, 255, 0))
+        #     up_down_velocity = 0
+        #     right_left_velocity = 0
 
-        # Convert frame to grayscale in order to apply the haar cascade
-        gray = cv.cvtColor(debug_image, cv.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(gray, 1.3, minNeighbors=5)
+        #     if distanceX < -TOLERANCE_X:
+        #         print("sposta il drone alla sua SX")
+        #         right_left_velocity = - DRONE_SPEED_X
 
-        # If a face is recognized, draw a rectangle over it and add it to the face list
-        face_center_x = center_x
-        face_center_y = center_y
-        z_area = 0
-        for face in faces:
-            (x, y, w, h) = face
-            cv.rectangle(debug_image,(x, y),(x + w, y + h),(255, 255, 0), 2)
+        #     elif distanceX > TOLERANCE_X:
+        #         print("sposta il drone alla sua DX")
+        #         right_left_velocity = DRONE_SPEED_X
+        #     else:
+        #         print("OK")
 
-            face_center_x = x + int(h/2)
-            face_center_y = y + int(w/2)
-            z_area = w * h
+        #     if distanceY < -TOLERANCE_Y:
+        #         print("sposta il drone in ALTO")
+        #         up_down_velocity = DRONE_SPEED_Y
+        #     elif distanceY > TOLERANCE_Y:
+        #         print("sposta il drone in BASSO")
+        #         up_down_velocity = - DRONE_SPEED_Y
 
-            cv.circle(debug_image, (face_center_x, face_center_y), 10, (0, 0, 255))
+        #     else:
+        #         print("OK")
 
-        # Calculate recognized face offset from center
-        offset_x = face_center_x - center_x
-        # Add 30 so that the drone covers as much of the subject as possible
-        offset_y = face_center_y - center_y - 30
+        #     if abs(distanceX) < SLOWDOWN_THRESHOLD_X:
+        #         right_left_velocity = int(right_left_velocity / 2)
+        #     if abs(distanceY) < SLOWDOWN_THRESHOLD_Y:
+        #         up_down_velocity = int(up_down_velocity / 2)
 
-        cv.putText(debug_image, f'[{offset_x}, {offset_y}, {z_area}]', (10, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255,255,255), 2, cv.LINE_AA)
-        # adjust_tello_position(tello, offset_x, offset_y, z_area)
+        #     tello.send_rc_control(right_left_velocity, 0, up_down_velocity, 0)
+
 
         cv.imshow('Tello Gesture Recognition', debug_image)
 
