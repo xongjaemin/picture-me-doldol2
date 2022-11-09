@@ -40,7 +40,28 @@ class TelloKeyboardController:
         cv.imwrite("photo/timer.jpg", frame_read.frame)
         print('success!')
 
+    def go_self_shoot(self):
+        self.tello.rotate_clockwise(180)
+        time.sleep(7)
+        self.tello.move_forward(100)
+        time.sleep(7)
+        self.tello.rotate_clockwise(180)
+        time.sleep(7)
+        frame_read = self.tello.get_frame_read()
+        cv.imwrite("photo/go_shoot.jpg", frame_read.frame)
+        self.tello.move_forward(100)
 
+    def go_shoot(self):
+        self.tello.rotate_clockwise(180)
+        time.sleep(7)
+        self.tello.move_forward(100)
+        time.sleep(7)
+        frame_read = self.tello.get_frame_read()
+        cv.imwrite("photo/go_shoot.jpg", frame_read.frame)
+        time.sleep(1)
+        self.tello.rotate_clockwise(180)
+        time.sleep(7)
+        self.tello.move_forward(100)
 
     def control(self, key):
         if key == ord('w'):
@@ -65,6 +86,10 @@ class TelloKeyboardController:
             self.cartoon()
         elif key == ord('t'):
             self.timer(3)
+        elif key == ord('='):
+            self.go_self_shoot()
+        elif key == ord('-'):
+            self.go_shoot()
 
 
     
